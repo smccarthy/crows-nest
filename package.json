@@ -1,0 +1,28 @@
+{
+  "name": "sauce-tunnel-supervisor",
+  "version": "0.0.1",
+  "description": "supervise sauce tunnels, restart one if dies",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gecgithub01.walmart.com:otto/sauce-tunnel-supervisor.git"
+  },
+  "author": "Lei Zhu <thunderzhulei@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "supervise": "./bin/supervise"
+  },
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "cli-color": "^1.1.0",
+    "lodash": "^4.15.0",
+    "moment": "^2.15.0",
+    "node-schedule": "^1.1.1",
+    "once": "^1.4.0",
+    "pm2": "^2.0.12",
+    "sauce-connect-launcher": "^0.16.0",
+    "yargs": "^5.0.0"
+  }
+}

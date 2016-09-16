@@ -1,0 +1,12 @@
+{
+  "username": "",
+  "accessKey": "",
+  "verbose": false,
+  "proxy": null,
+  "tunnelIdentifier": "",
+  "waitTunnelShutdown": true,
+  "noRemoveCollidingTunnels": true,
+  "sharedTunnel": true,
+
+  "restartCron": "0 3 * * *"
+}

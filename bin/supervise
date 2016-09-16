@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+
+var Promise = require("bluebird");
+var path = require("path");
+var logger = require("../lib/logger");
+var once = require('once')
+
+var argv = require("yargs")
+  .usage("Usage: node ./bin/supervise [options]")
+  .option("tunnels", {
+    describe: "How many sauce tunnels would be open",
+    number: true
+  })
+  .option("rollingRestart", {
+    describe: "Enable rolling restart feature",
+    boolean: true
+  })
+  .option("debug", {
+    describe: "Enable debug mode",
+    boolean: true
+  })
+  .option("config", {
+    describe: "Specify sauce tunnel configuration location",
+    string: true
+  })
+  .help("h")
+  .alias("h", "help")
+  .argv;
+
+var Supervisor = require("../lib/supervisor");
+var config = require("../config.json");
+
+var tunnels = 1;
+if (argv.tunnels) {
+  tunnels = argv.tunnels;
+}
+
+if (argv.config) {
+  config = require(path.resolve(process.cwd(), argv.config));
+}
+
+// 2:00am every day
+var restartCron = "0 2 * * *";
+if (config.restartCron) {
+  restartCron = config.restartCron;
+}
+
+var rollingRestart = !!argv.rollingRestart;
+
+var options = {
+  tunnelAmount: tunnels,
+  tunnelConfig: config,
+  restartCron: restartCron
+};
+
+var supervisor = new Supervisor(options);
+
+var exitProcess = once(function(signal){
+  logger.warn("Received " + signal + ". Stopping all Sauce Tunnels and Existing.");
+      
+  supervisor
+    .stopTunnels()
+    .then(function(){
+      process.exit(0);
+    });
+});
+
+Promise
+  .delay(500)
+  .then(function () {
+    return supervisor.stage();
+  })
+  .then(function () {
+    return supervisor.startTunnels();
+  })
+  .then(function () {
+    process.on("SIGINT", function(){
+      exitProcess("SIGINT");
+    });
+    process.on("SIGTERM", function(){
+      exitProcess("SIGTERM");
+    });
+
+    if(rollingRestart){
+      supervisor.scheduleRestart();
+    }
+
+    return supervisor.supervise();
+  });
