@@ -1,13 +1,13 @@
 {
-  "name": "sauce-tunnel-supervisor",
-  "version": "0.0.1",
+  "name": "testarmada-crows-nest",
+  "version": "1.0.0",
   "description": "supervise sauce tunnels, restart one if dies",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git@gecgithub01.walmart.com:otto/sauce-tunnel-supervisor.git"
+    "url": "git@github.com:TestArmada/crows-nest.git"
   },
   "author": "Lei Zhu <thunderzhulei@gmail.com>",
   "license": "MIT",
