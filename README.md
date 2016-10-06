@@ -42,7 +42,7 @@ You can set `username` and `accessKey` using one of the following methods:
  1. Specifying the values in `./config.json`
  2. Setting the environment variable `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY`  
 
-If the rolling restart feature is enabeld, `restartCron` must be a valid cron value.
+If the rolling restart feature is enabled, `restartCron` must be a valid cron value.
 
 ### Help
 
