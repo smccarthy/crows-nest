@@ -27,7 +27,7 @@ By launching sauce tunnels in high availability mode with crows-nest, you won't 
   "waitTunnelShutdown": true,
   "noRemoveCollidingTunnels": true,
 
-  "restartCron": "*/2 * * * *"
+  "restartCron": "0 */4 * * *"
 }
 ```
 
@@ -36,6 +36,8 @@ By launching sauce tunnels in high availability mode with crows-nest, you won't 
 More configurations please refer to this page [sauce-connect-launcher](https://github.com/bermi/sauce-connect-launcher#advanced-usage).
 
 In high availability mode all tunnels share the same `tunnelIdentifier`. `tunnelIdentifier` can be any string.  One suggested convention is to use this ID to describe the geographical location where your tunnel terminates.  For example, `east` or `west`.  
+
+The `restartCron` value is any valid cron schedule.  For example `0 */4 * * *` would mean "every 4 hours".  We recommend [crontab.guru](http://crontab.guru/examples.html) for help generating valid cron strings to match the desired schedule.
 
 You can set `username` and `accessKey` using one of the following methods:
  
