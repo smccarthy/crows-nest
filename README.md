@@ -14,6 +14,12 @@ By launching sauce tunnels in high availability mode with crows-nest, you won't 
 
 ## Usage
 
+### How to Build
+
+Since Crows-nest is coded in ES6, you might need to compile it before running it in your nodejs env. To compile, run following commands in the repo root
+ 1. `npm install`
+ 2. `npm run build`
+
 ### Configuration
 
 ```

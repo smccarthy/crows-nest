@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "supervise sauce tunnels, restart one if dies",
   "scripts": {
+    "build": "./node_modules/.bin/babel lib --out-dir dist --source-maps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
