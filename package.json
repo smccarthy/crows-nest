@@ -3,6 +3,7 @@
   "version": "1.0.1",
   "description": "supervise sauce tunnels, restart one if dies",
   "scripts": {
+    "build": "./node_modules/.bin/babel lib --out-dir dist --source-maps",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,6 +16,8 @@
     "supervise": "./bin/supervise"
   },
   "dependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
     "bluebird": "^3.4.6",
     "cli-color": "^1.1.0",
     "lodash": "^4.15.0",
