@@ -26,6 +26,7 @@
     "once": "^1.4.0",
     "pm2": "^2.0.12",
     "sauce-connect-launcher": "^0.16.0",
+    "tree-kill": "^1.1.0",
     "yargs": "^5.0.0"
   }
 }
