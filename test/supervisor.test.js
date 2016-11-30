@@ -2,6 +2,16 @@ import Supervisor from "../supervisor";
 import Promise from "bluebird";
 import chai from "chai";
 
+import logger from "../logger";
+
+// eat console logs
+logger.output = {
+  log() { },
+  error() { },
+  debug() { },
+  warn() { }
+};
+
 const expect = chai.expect;
 
 describe("Supervisor", () => {
@@ -149,7 +159,7 @@ describe("Supervisor", () => {
           expect(true).to.equal(true);
           done();
         })
-        .catch(() => {
+        .catch((err) => {
           expect(true).to.equal(false);
           done();
         });
@@ -165,7 +175,7 @@ describe("Supervisor", () => {
           expect(true).to.equal(false);
           done();
         })
-        .catch(() => {
+        .catch((err) => {
           expect(true).to.equal(true);
           done();
         });
@@ -181,7 +191,7 @@ describe("Supervisor", () => {
           expect(true).to.equal(false);
           done();
         })
-        .catch(() => {
+        .catch((err) => {
           expect(true).to.equal(true);
           done();
         });
@@ -197,7 +207,7 @@ describe("Supervisor", () => {
           expect(true).to.equal(false);
           done();
         })
-        .catch(() => {
+        .catch((err) => {
           expect(true).to.equal(true);
           done();
         });
