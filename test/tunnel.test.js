@@ -18,7 +18,7 @@ const expect = chai.expect;
 
 describe("Tunnel", () => {
   let sauceConnectLauncherMock = null;
-
+  let saucelabsApiMock = null;
 
 
   let options = {
@@ -36,15 +36,19 @@ describe("Tunnel", () => {
     pidTempPath: "temp"
   };
 
+  let t = null;
+
   beforeEach(() => {
     sauceConnectLauncherMock = (options, cb) => {
       cb(null, { "_handle": {}, close(cb) { cb() } });
     };
+
+    saucelabsApiMock = { deleteTunnel(id, cb) { cb(null, "fake res") } };
+
+    t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock, saucelabsApi: saucelabsApiMock }));
   });
 
   it("Initialization", () => {
-    let t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
-
     expect(t.state).to.equal(STATE.IDLE);
     expect(t.retried).to.equal(0);
     expect(t.index).to.equal(1);
@@ -55,8 +59,6 @@ describe("Tunnel", () => {
     this.timeout(60000);
 
     it("Straight succeed", (done) => {
-      let t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
-
       t.start()
         .then(() => {
           expect(t.state).to.equal(STATE.RUNNING);
@@ -72,7 +74,7 @@ describe("Tunnel", () => {
     it("Succeed with retry", (done) => {
       let count = 0;
 
-      sauceConnectLauncherMock = (options, cb) => {
+      t.sauceConnectLauncher = (options, cb) => {
         count++;
         if (count < 5) {
           cb(new Error("fake error"), null);
@@ -80,8 +82,6 @@ describe("Tunnel", () => {
           cb(null, { close(cb) { cb() } });
         }
       };
-
-      let t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
 
       t.start()
         .then(() => {
@@ -96,8 +96,7 @@ describe("Tunnel", () => {
     });
 
     it("Fail after 10 retries", (done) => {
-      sauceConnectLauncherMock = (options, cb) => { cb(new Error("fake error"), null); };
-      let t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
+      t.sauceConnectLauncher = (options, cb) => { cb(new Error("fake error"), null); };
 
       t.start()
         .then(() => {
@@ -112,7 +111,6 @@ describe("Tunnel", () => {
     });
 
     it("Skip starting if state isn't IDLE", (done) => {
-      let t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
       t.state = STATE.STARTING;
 
       t.start()
@@ -130,11 +128,8 @@ describe("Tunnel", () => {
 
   describe("Stop tunnel", function () {
     this.timeout(60000);
-    let t = null;
 
     beforeEach((done) => {
-      t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
-
       t.start()
         .then(() => {
           done();
@@ -217,15 +212,77 @@ describe("Tunnel", () => {
           done();
         });
     });
+
+    describe("Kill tunnel", () => {
+      it("Kill successfully", (done) => {
+        t.treeKill = (pid, signal, cb) => { cb() };
+
+        t.kill(true)
+          .then(() => {
+            expect(t.state).to.equal(STATE.IDLE);
+            expect(true).to.equal(true);
+            done();
+          })
+          .catch((err) => {
+            expect(true).to.equal(false);
+            done();
+          });
+      });
+
+      it("Fail in kill", (done) => {
+        t.treeKill = (pid, signal, cb) => { cb("fake_err") };
+
+        t.kill(true)
+          .then(() => {
+            expect(true).to.equal(false);
+            done();
+          })
+          .catch((err) => {
+            expect(t.state).to.equal(STATE.RUNNING);
+            expect(true).to.equal(true);
+            done();
+          });
+      });
+
+      it("Do nothing if stop isn't timing out", (done) => {
+        t.treeKill = (pid, signal, cb) => { cb("fake_err") };
+        t.state = STATE.IDLE;
+
+        t.kill()
+          .then(() => {
+            expect(t.state).to.equal(STATE.IDLE);
+            expect(true).to.equal(true);
+            done();
+          })
+          .catch((err) => {
+            expect(true).to.equal(false);
+            done();
+          });
+      });
+
+      it("Do nothing if tunnelProcess is null", (done) => {
+        t.treeKill = (pid, signal, cb) => { cb("fake_err") };
+        t.state = STATE.IDLE;
+        t.tunnelProcess = null;
+
+        t.kill()
+          .then(() => {
+            expect(t.state).to.equal(STATE.IDLE);
+            expect(true).to.equal(true);
+            done();
+          })
+          .catch((err) => {
+            expect(true).to.equal(false);
+            done();
+          });
+      });
+    });
   });
 
   describe("Restart tunnel", function () {
     this.timeout(60000);
-    let t = null;
 
     beforeEach((done) => {
-      t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock }));
-
       t.start()
         .then(() => {
           done();
@@ -240,6 +297,36 @@ describe("Tunnel", () => {
       t.restart()
         .then(() => {
           expect(t.state).to.equal(STATE.RUNNING);
+          expect(true).to.equal(true);
+          done();
+        })
+        .catch((err) => {
+          expect(true).to.equal(false);
+          done();
+        });
+    });
+
+    it("Do nothing if state is STARTING", (done)=>{
+      t.state = STATE.STARTING;
+
+      t.restart()
+        .then(() => {
+          expect(t.state).to.equal(STATE.STARTING);
+          expect(true).to.equal(true);
+          done();
+        })
+        .catch((err) => {
+          expect(true).to.equal(false);
+          done();
+        });
+    });
+
+    it("Do nothing if state is STOPPING", (done)=>{
+      t.state = STATE.STOPPING;
+
+      t.restart()
+        .then(() => {
+          expect(t.state).to.equal(STATE.STOPPING);
           expect(true).to.equal(true);
           done();
         })
