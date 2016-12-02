@@ -1,6 +1,7 @@
 import Supervisor from "../supervisor";
 import Promise from "bluebird";
 import chai from "chai";
+import chaiAsPromise from "chai-as-promised";
 
 import logger from "../logger";
 
@@ -12,7 +13,10 @@ logger.output = {
   warn() { }
 };
 
+chai.use(chaiAsPromise);
+
 const expect = chai.expect;
+const assert = chai.assert;
 
 describe("Supervisor", () => {
   it("Initialization", () => {
@@ -45,7 +49,7 @@ describe("Supervisor", () => {
     describe("Stage one tunnel successfully", () => {
       let s = null;
 
-      before((done) => {
+      before(() => {
         s = new Supervisor({
           tunnelAmount: 1,
           tunnelConfig: {
@@ -63,7 +67,7 @@ describe("Supervisor", () => {
           restartCron: false
         });
 
-        s.stage().then(done);
+        return s.stage();
       });
 
       it("Check supervisor", () => {
@@ -84,7 +88,7 @@ describe("Supervisor", () => {
     describe("Stage 10 tunnels successfully", () => {
       let s = null;
 
-      before((done) => {
+      before(() => {
         s = new Supervisor({
           tunnelAmount: 10,
           tunnelConfig: {
@@ -102,7 +106,7 @@ describe("Supervisor", () => {
           restartCron: false
         });
 
-        s.stage().then(done);
+        return s.stage();
       });
 
       it("Check supervisor", () => {
@@ -128,7 +132,7 @@ describe("Supervisor", () => {
   describe("Start tunnels", () => {
     let s = null;
 
-    before((done) => {
+    before(() => {
       s = new Supervisor({
         tunnelAmount: 3,
         tunnelConfig: {
@@ -146,71 +150,46 @@ describe("Supervisor", () => {
         restartCron: false
       });
 
-      s.stage().then(done);
+      return s.stage();
     });
 
-    it("All tunnels start successfully", (done) => {
+    it("All tunnels start successfully", () => {
       for (let i = 0; i < s.tunnels.length; i++) {
         s.tunnels[i].start = () => Promise.resolve();
       }
 
-      s.startTunnels()
-        .then(() => {
-          expect(true).to.equal(true);
-          done();
-        })
-        .catch((err) => {
-          expect(true).to.equal(false);
-          done();
-        });
+      return s.startTunnels()
+        .catch(err => assert(false, "One of the tunnel failed in starting"))
     });
 
-    it("All tunnels fail in starting", (done) => {
+    it("All tunnels fail in starting", () => {
       for (let i = 0; i < s.tunnels.length; i++) {
         s.tunnels[i].start = () => Promise.reject();
       }
 
-      s.startTunnels()
-        .then(() => {
-          expect(true).to.equal(false);
-          done();
-        })
-        .catch((err) => {
-          expect(true).to.equal(true);
-          done();
-        });
+      return s.startTunnels()
+        .then(() => assert(false, "One of the tunnel succeeded in starting"))
+        .catch(err => Promise.resolve());
     });
 
-    it("One tunnel fails in starting", (done) => {
+    it("One tunnel fails in starting", () => {
       s.tunnels[0].start = () => Promise.resolve();
       s.tunnels[1].start = () => Promise.reject();
       s.tunnels[2].start = () => Promise.resolve();
 
-      s.startTunnels()
-        .then(() => {
-          expect(true).to.equal(false);
-          done();
-        })
-        .catch((err) => {
-          expect(true).to.equal(true);
-          done();
-        });
+      return s.startTunnels()
+        .then(() => assert(false, "One of the tunnel succeeded in starting"))
+        .catch(err => Promise.resolve());
     });
 
-    it("More tunnels fail in starting", (done) => {
+    it("More tunnels fail in starting", () => {
       s.tunnels[0].start = () => Promise.resolve();
       s.tunnels[1].start = () => Promise.reject();
       s.tunnels[2].start = () => Promise.reject();
 
-      s.startTunnels()
-        .then(() => {
-          expect(true).to.equal(false);
-          done();
-        })
-        .catch((err) => {
-          expect(true).to.equal(true);
-          done();
-        });
+      return s.startTunnels()
+        .then(() => assert(false, "One of the tunnel succeeded in starting"))
+        .catch(err => Promise.resolve());
     });
   })
 });
