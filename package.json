@@ -1,6 +1,6 @@
 {
   "name": "testarmada-crows-nest",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "supervise sauce tunnels, restart one if dies",
   "scripts": {
     "build": "./node_modules/.bin/babel lib --out-dir dist --source-maps",
