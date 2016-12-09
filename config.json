@@ -8,5 +8,9 @@
   "noRemoveCollidingTunnels": true,
   "sharedTunnel": true,
 
-  "restartCron": "0 3 * * *"
+  "restartCron": "*/5 * * * *",
+
+  "statsdHost": "",
+  "statsdPort": null,
+  "statsdPrefix": "."
 }
