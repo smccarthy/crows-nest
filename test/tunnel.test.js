@@ -97,7 +97,7 @@ describe("Tunnel", () => {
       return t.start()
         .then(() => expect(Promise.resolve(t.state)).to.eventually.equal(STATE.RUNNING))
         .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]).length)).to.eventually.equal(1))
-        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.data)).to.eventually.equal(4))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.data)).to.eventually.equal(3))
         .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_RETRYING))
         .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.tunnelIndex)).to.eventually.equal(1))
         .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]).length)).to.eventually.equal(1))
