@@ -1,4 +1,5 @@
 import { STATE, Tunnel } from "../tunnel";
+import { EVENT, StatsQueue } from "../stats";
 import Promise from "bluebird";
 import chai from "chai";
 import chaiAsPromise from "chai-as-promised";
@@ -23,7 +24,8 @@ const assert = chai.assert;
 describe("Tunnel", () => {
   let sauceConnectLauncherMock = null;
   let saucelabsApiMock = null;
-
+  let statsDMock = { gauge(stat, data, tags) { } };
+  let statsQueue = {};
 
   let options = {
     username: "fake_name",
@@ -47,9 +49,21 @@ describe("Tunnel", () => {
       cb(null, { "_handle": {}, close(cb) { cb() } });
     };
 
+    statsQueue = new StatsQueue({
+      statsSwitch: true,
+      statsdHost: "some.where.local.org",
+      statsdPort: null,
+      statsdPrefix: "fake.",
+      statsD: statsDMock
+    });
+
     saucelabsApiMock = { deleteTunnel(id, cb) { cb(null, "fake res") } };
 
-    t = new Tunnel(_.extend({}, options, { sauceConnectLauncher: sauceConnectLauncherMock, saucelabsApi: saucelabsApiMock }));
+    t = new Tunnel(_.extend({}, options, {
+      sauceConnectLauncher: sauceConnectLauncherMock,
+      saucelabsApi: saucelabsApiMock,
+      statsQueue: statsQueue
+    }));
   });
 
   it("Initialization", () => {
@@ -82,15 +96,23 @@ describe("Tunnel", () => {
 
       return t.start()
         .then(() => expect(Promise.resolve(t.state)).to.eventually.equal(STATE.RUNNING))
-        .catch(err => assert(false, "Tunnel failed in launching up with retry"));
+        .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]).length)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.data)).to.eventually.equal(3))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_RETRYING))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_RETRYING]["1"].event.tunnelIndex)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]).length)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.data)).to.eventually.equal(4))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_CONNECTED))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.tunnelIndex)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]).length)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_BUILD_CONNECTITON))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]["1"].event.tunnelIndex)).to.eventually.equal(1))
+        .catch(err => assert(false, "Tunnel failed in launching up with retry " + err));
     });
 
     it("Fail after 10 retries", () => {
       t.sauceConnectLauncher = (options, cb) => { cb(new Error("fake_err"), null); };
-      process.on("unhandledRejection", function (reason, promise) {
-        // See Promise.onPossiblyUnhandledRejection for parameter documentation
-        console.log(reason, promise)
-      });
+
       return t.start()
         .then(() => assert(false, "Tunnel succeeded in launching up"))
         .catch((err) => expect(Promise.resolve(t.state)).to.eventually.equal(STATE.IDLE));
@@ -101,6 +123,19 @@ describe("Tunnel", () => {
 
       return t.start()
         .catch(err => assert(false, "Tunnel succeeded in launching up with state = IDLE"));
+    });
+
+    it("Stats works", () => {
+      return t
+        .start()
+        .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]).length)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.data)).to.eventually.equal(0))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_CONNECTED))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_CONNECTED]["1"].event.tunnelIndex)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]).length)).to.eventually.equal(1))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_BUILD_CONNECTITON))
+        .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_BUILD_CONNECTITON]["1"].event.tunnelIndex)).to.eventually.equal(1))
+        .catch(err => assert(false, "Stats isn't pushed correctly during start" + err));
     });
 
   });
@@ -185,6 +220,34 @@ describe("Tunnel", () => {
         return t.kill()
           .then(() => expect(Promise.resolve(t.state)).to.eventually.equal(STATE.IDLE))
           .catch(err => assert(false, "Tunnel is killed"));
+      });
+
+      it("Stats works if stop succeeds", () => {
+        t.state = STATE.IDLE;
+        t.tunnelProcess = null;
+
+        return t
+          .kill()
+          .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]).length)).to.eventually.equal(1))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.data)).to.eventually.equal(1))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_STOPPED))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.tunnelIndex)).to.eventually.equal(1))
+          .catch(err => assert(false, "Stats isn't pushed correctly during start" + err));
+      });
+
+      it("Stats works if stop doesnt succeed", () => {
+        t.tunnelProcess = { id: 1 };
+        t.treeKill = (pid, signal, cb) => { cb() };
+
+        t.state = STATE.RUNNING;
+
+        return t
+          .kill(true)
+          .then(() => expect(Promise.resolve(_.values(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]).length)).to.eventually.equal(1))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.data)).to.eventually.equal(1))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.eventType)).to.eventually.equal(EVENT.TUNNEL_STOPPED))
+          .then(() => expect(Promise.resolve(t.statsQueue.statsQueue[EVENT.TUNNEL_STOPPED]["1"].event.tunnelIndex)).to.eventually.equal(1))
+          .catch(err => assert(false, "Stats isn't pushed correctly during start" + err));
       });
     });
   });
