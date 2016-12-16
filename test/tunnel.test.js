@@ -24,7 +24,7 @@ const assert = chai.assert;
 describe("Tunnel", () => {
   let sauceConnectLauncherMock = null;
   let saucelabsApiMock = null;
-  let statsDMock = { gauge(stat, data, tags) { } };
+  let statsMock = { gauge(stat, data, tags) { } };
   let statsQueue = {};
 
   let options = {
@@ -51,10 +51,10 @@ describe("Tunnel", () => {
 
     statsQueue = new StatsQueue({
       statsSwitch: true,
-      statsdHost: "some.where.local.org",
-      statsdPort: null,
-      statsdPrefix: "fake.",
-      statsD: statsDMock
+      statsHost: "some.where.local.org",
+      statsPort: null,
+      statsPrefix: "fake.",
+      stats: statsMock
     });
 
     saucelabsApiMock = { deleteTunnel(id, cb) { cb(null, "fake res") } };
