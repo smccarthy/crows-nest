@@ -34,6 +34,14 @@ describe("Supervisor", () => {
 
         "restartCron": "*/2 * * * *"
       },
+      statsSwitch: false,
+      statsConfig: {
+        "statsType": "influxdb",
+        "statsHost": "",
+        "statsPort": null,
+        "statsPrefix": "testdddtest.",
+        "statsDatabase": ""
+      },
       restartCron: false
     });
 
@@ -63,6 +71,14 @@ describe("Supervisor", () => {
             "sharedTunnel": true,
 
             "restartCron": "*/2 * * * *"
+          },
+          statsSwitch: false,
+          statsConfig: {
+            "statsType": "influxdb",
+            "statsHost": "",
+            "statsPort": null,
+            "statsPrefix": "testdddtest.",
+            "statsDatabase": ""
           },
           restartCron: false
         });
@@ -102,6 +118,14 @@ describe("Supervisor", () => {
             "sharedTunnel": true,
 
             "restartCron": "*/2 * * * *"
+          },
+          statsSwitch: false,
+          statsConfig: {
+            "statsType": "influxdb",
+            "statsHost": "",
+            "statsPort": null,
+            "statsPrefix": "testdddtest.",
+            "statsDatabase": ""
           },
           restartCron: false
         });
@@ -191,5 +215,102 @@ describe("Supervisor", () => {
         .then(() => assert(false, "One of the tunnel succeeded in starting"))
         .catch(err => Promise.resolve());
     });
-  })
+  });
+
+  describe("Stats", () => {
+    it("Stats is enabled with valid adaptor", () => {
+      let s = new Supervisor({
+        tunnelAmount: 3,
+        tunnelConfig: {
+          "username": "fake_name",
+          "accessKey": "fake_key",
+          "verbose": false,
+          "proxy": null,
+          "tunnelIdentifier": "testfortest",
+          "waitTunnelShutdown": true,
+          "noRemoveCollidingTunnels": true,
+          "sharedTunnel": true,
+
+          "restartCron": "*/2 * * * *"
+        },
+        statsSwitch: true,
+        statsConfig: {
+          "statsType": "influxdb",
+          "statsHost": "",
+          "statsPort": null,
+          "statsPrefix": "testdddtest.",
+          "statsDatabase": ""
+        },
+        restartCron: false
+      });
+
+      assert(true, "Stats is enabled with valid adaptor");
+    });
+
+    it("Stats is enabled with invalid adaptor", () => {
+      try {
+        let s = new Supervisor({
+          tunnelAmount: 3,
+          tunnelConfig: {
+            "username": "fake_name",
+            "accessKey": "fake_key",
+            "verbose": false,
+            "proxy": null,
+            "tunnelIdentifier": "testfortest",
+            "waitTunnelShutdown": true,
+            "noRemoveCollidingTunnels": true,
+            "sharedTunnel": true,
+
+            "restartCron": "*/2 * * * *"
+          },
+          statsSwitch: true,
+          statsConfig: {
+            "statsType": "mongodb",
+            "statsHost": "",
+            "statsPort": null,
+            "statsPrefix": "testdddtest.",
+            "statsDatabase": ""
+          },
+          restartCron: false
+        });
+
+        assert(false, "Stats is enabled with invalid adaptor")
+      } catch (err) {
+        expect(err.message).to.equal("No such stats adaptor found in lib/stats/");
+      }
+    });
+
+    it("Stats is disabled with invalid adaptor", () => {
+      try {
+        let s = new Supervisor({
+          tunnelAmount: 3,
+          tunnelConfig: {
+            "username": "fake_name",
+            "accessKey": "fake_key",
+            "verbose": false,
+            "proxy": null,
+            "tunnelIdentifier": "testfortest",
+            "waitTunnelShutdown": true,
+            "noRemoveCollidingTunnels": true,
+            "sharedTunnel": true,
+
+            "restartCron": "*/2 * * * *"
+          },
+          statsSwitch: false,
+          statsConfig: {
+            "statsType": "mongodb",
+            "statsHost": "",
+            "statsPort": null,
+            "statsPrefix": "testdddtest.",
+            "statsDatabase": ""
+          },
+          restartCron: false
+        });
+
+        assert(true, "Stats is disabled with invalid adaptor")
+      } catch (err) {
+        assert(false, "Stats is enabled with invalid adaptor")
+      }
+    });
+  });
 });

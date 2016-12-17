@@ -40,8 +40,6 @@ describe("Stats", () => {
 
   it("Initialization", () => {
     expect(s.statsSwitch).to.equal(options.statsSwitch);
-    expect(s.statsHost).to.equal(options.statsHost);
-    expect(s.statsPort).to.equal(options.statsPort);
     expect(s.statsPrefix).to.equal(options.statsPrefix);
   });
 

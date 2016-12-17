@@ -51,9 +51,11 @@ describe("Tunnel", () => {
 
     statsQueue = new StatsQueue({
       statsSwitch: true,
+      statsType: "influxdb",
       statsHost: "some.where.local.org",
       statsPort: null,
       statsPrefix: "fake.",
+      statsDatabase: "",
       stats: statsMock
     });
 
