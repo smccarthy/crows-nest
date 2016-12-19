@@ -21,28 +21,26 @@ const expect = chai.expect;
 const assert = chai.assert;
 
 describe("Stats", () => {
-  let statsDMock = null;
+  let statsMock = null;
 
   let options = {
     statsSwitch: false,
-    statsdHost: "some.where.local.org",
-    statsdPort: null,
-    statsdPrefix: "fake."
+    statsHost: "some.where.local.org",
+    statsPort: null,
+    statsPrefix: "fake."
   };
 
   let s = null;
 
   beforeEach(() => {
-    statsDMock = { gauge(stat, data, tags) { } };
+    statsMock = { gauge(key, timestamp, data, tags, callback) { return Promise.resolve() } };
 
-    s = new StatsQueue(_.extend({}, options, { statsD: statsDMock }));
+    s = new StatsQueue(_.extend({}, options, { statsClient: statsMock }));
   });
 
   it("Initialization", () => {
     expect(s.statsSwitch).to.equal(options.statsSwitch);
-    expect(s.statsdHost).to.equal(options.statsdHost);
-    expect(s.statsdPort).to.equal(options.statsdPort);
-    expect(s.statsdPrefix).to.equal(options.statsdPrefix);
+    expect(s.statsPrefix).to.equal(options.statsPrefix);
   });
 
   it("Build empty queue", () => {

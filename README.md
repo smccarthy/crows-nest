@@ -25,30 +25,60 @@ Since Crows-nest is coded in ES6, you might need to compile it before running it
 ```
 ./config.json
 {
-  "username": "",
-  "accessKey": "",
-  "verbose": false,
-  "proxy": null,
-  "tunnelIdentifier": "",
-  "waitTunnelShutdown": true,
-  "noRemoveCollidingTunnels": true,
+  "tunnel": {
+    "username": "",
+    "accessKey": "",
+    "verbose": false,
+    "proxy": null,
+    "tunnelIdentifier": "",
+    "waitTunnelShutdown": true,
+    "noRemoveCollidingTunnels": true,
+    "sharedTunnel": true
+  },
+  "stats": {
+    "statsType": "",
+    "statsHost": "",
+    "statsPort": null,
+    "statsPrefix": "",
+    "statsDatabase": ""
+  },
 
   "restartCron": "0 */4 * * *"
 }
 ```
 
-`./config.json` file has the basic configurations that are required by Sauce Connect. To launch your own tunnels, `username`, `accessKey` and `tunnelIdentifier` are mandatory. 
+`./config.json` file has the basic configurations that are required by Sauce Connect. 
 
-More configurations please refer to this page [sauce-connect-launcher](https://github.com/bermi/sauce-connect-launcher#advanced-usage).
+#### Tunnel config
 
-In high availability mode all tunnels share the same `tunnelIdentifier`. `tunnelIdentifier` can be any string.  One suggested convention is to use this ID to describe the geographical location where your tunnel terminates.  For example, `east` or `west`.  
+To launch your own tunnels, `tunnel.username`, `tunnel.accessKey` and `tunnel.tunnelIdentifier` are mandatory. More configurations please refer to this page [sauce-connect-launcher](https://github.com/bermi/sauce-connect-launcher#advanced-usage).
+
+In high availability mode all tunnels share the same `tunnel.tunnelIdentifier`. `tunnel.tunnelIdentifier` can be any string.  One suggested convention is to use this ID to describe the geographical location where your tunnel terminates.  For example, `east` or `west`.  
 
 The `restartCron` value is any valid cron schedule.  For example `0 */4 * * *` would mean "every 4 hours".  We recommend [crontab.guru](http://crontab.guru/examples.html) for help generating valid cron strings to match the desired schedule.
 
-You can set `username` and `accessKey` using one of the following methods:
+You can set `tunnel.username` and `tunnel.accessKey` using one of the following methods:
  
  1. Specifying the values in `./config.json`
- 2. Setting the environment variable `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY`  
+ 2. Setting the environment variable `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY`
+
+#### Stats config
+
+From `@1.3.0` crows-nest starts to support pushing stats to a statsd-like system. To utilize this data pushing function you need to explicitly add `--stats` in your command. There are only two adaptors supported for now, adaptor for [telegraf](https://github.com/influxdata/telegraf) and adaptor for pushing data into influxdb directly. You can extend `lib/stats/base` to add more adaptors. 
+
+For instance, in `config.json`, `stats.statsType =  influxdb` will tell the adaptor factory to look for a mapping with key `influxdb` configured in `factory.js`. Adaptor factory will return an instance of influxdb adaptor which is defined in `influxdb.js`. If there is no adaptor found by adaptor factory, it will throw an error to prevent crows-nest from starting.
+
+Stats only supports `gauge` for now.
+
+Following data will be gathered and pushed
+ 1. How many connection attempts a tunnel has been made before failing
+ 2. How many connection attempts a tunnel has been made for now 
+ 3. How many attempts a tunnel has been made to successfully connect
+ 4. When a tunnel successfully stopped
+ 5. How long a tunnel run (unix timestamp)
+ 6. How long a tunnel takes to successfully connect
+
+#### Other configs
 
 If the rolling restart feature is enabled, `restartCron` must be a valid cron value.
 
@@ -72,9 +102,9 @@ SAUCE_USERNAME=xxx SAUCE_ACCESS_KEY=yyy ./bin/supervise --tunnels 1 --rollingRes
 
 ### Advanced usage
 
-Read sauce tunnel configuration from `./myproject/config.json` and launch 20 sauce tunnels in high availability mode
+Read sauce tunnel configuration from `./myproject/config.json` and launch 20 sauce tunnels in high availability mode, with rolling restarted and stats data pushing feature enabled
 ```
-./bin/supervise --tunnels 20 --config ./myproject/config.json
+./bin/supervise --tunnels 20 --config ./myproject/config.json --rollingRestart --stats
 ```
 
 ### Daemon

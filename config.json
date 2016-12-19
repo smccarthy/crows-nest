@@ -1,17 +1,20 @@
 {
-  "username": "",
-  "accessKey": "",
-  "verbose": false,
-  "proxy": null,
-  "tunnelIdentifier": "",
-  "waitTunnelShutdown": true,
-  "noRemoveCollidingTunnels": true,
-  "sharedTunnel": true,
-
-  "restartCron": "0 3 * * *",
-
-  "statsdHost": "",
-  "statsdPort": null,
-  "statsdPrefix": ".",
-  "telegraf": true
+  "tunnel": {
+    "username": "",
+    "accessKey": "",
+    "verbose": false,
+    "proxy": null,
+    "tunnelIdentifier": "",
+    "waitTunnelShutdown": true,
+    "noRemoveCollidingTunnels": true,
+    "sharedTunnel": true
+  },
+  "stats": {
+    "statsType": "influxdb",
+    "statsHost": "",
+    "statsPort": null,
+    "statsPrefix": "testdddtest.",
+    "statsDatabase": ""
+  },
+  "restartCron": "0 3 * * *"
 }
