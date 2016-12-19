@@ -64,7 +64,9 @@ You can set `tunnel.username` and `tunnel.accessKey` using one of the following 
 
 #### Stats config
 
-From `@1.3.0` crows-nest starts to support pushing stats to a statsd-like system. To utilize this data pushing function you need to explicitly add `--stats` in your command. There are only two adaptors supported for now, adaptor for [telegraf](https://github.com/influxdata/telegraf) and adaptor for pushing data into influxdb directly. You can extend `lib/stats/base` to add more adaptors.
+From `@1.3.0` crows-nest starts to support pushing stats to a statsd-like system. To utilize this data pushing function you need to explicitly add `--stats` in your command. There are only two adaptors supported for now, adaptor for [telegraf](https://github.com/influxdata/telegraf) and adaptor for pushing data into influxdb directly. You can extend `lib/stats/base` to add more adaptors. 
+
+For instance, in `config.json`, `stats.statsType =  influxdb` will tell the adaptor factory to look for a mapping with key `influxdb` configured in `factory.js`. Adaptor factory will return an instance of influxdb adaptor which is defined in `influxdb.js`. If there is no adaptor found by adaptor factory, it will throw an error to prevent crows-nest from starting.
 
 Stats only supports `gauge` for now.
 
