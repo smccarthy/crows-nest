@@ -217,6 +217,41 @@ describe("Supervisor", () => {
     });
   });
 
+  describe("Stop tunnels", () => {
+    let s = null;
+
+    before(() => {
+      s = new Supervisor({
+        tunnelAmount: 3,
+        tunnelConfig: {
+          "username": "fake_name",
+          "accessKey": "fake_key",
+          "verbose": false,
+          "proxy": null,
+          "tunnelIdentifier": "testfortest",
+          "waitTunnelShutdown": true,
+          "noRemoveCollidingTunnels": true,
+          "sharedTunnel": true,
+
+          "restartCron": "*/2 * * * *"
+        },
+        restartCron: false
+      });
+      
+      return s
+        .stage();
+    });
+
+    it("All tunnels stop successfully", () => {
+      for (let i = 0; i < s.tunnels.length; i++) {
+        s.tunnels[i].stop = () => Promise.resolve();
+      }
+
+      return s.stopTunnels()
+        .catch(err => assert(false, "One of the tunnel failed in starting"))
+    });
+  });
+
   describe("Stats", () => {
     it("Stats is enabled with valid adaptor", () => {
       let s = new Supervisor({

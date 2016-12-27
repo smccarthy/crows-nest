@@ -6,4 +6,7 @@ node_js:
   - v4
 
 script:
-  - npm run test
+  - npm run coverage
+  
+after_success:
+  - npm run upload-coverage

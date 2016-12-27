@@ -1,6 +1,10 @@
 <img width="40%" height="40%" align="right" src="https://cloud.githubusercontent.com/assets/1438478/18613191/055e771a-7d32-11e6-8f1c-9fe3c328696c.jpeg">
 
-# crows-nest
+# Crows-Nest
+
+[![Build Status](https://api.travis-ci.org/TestArmada/crows-nest.svg?branch=master)](https://travis-ci.org/TestArmada/crows-nest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/TestArmada/crows-nest/branch/master/graph/badge.svg)](https://codecov.io/gh/TestArmada/crows-nest)
 
 A supervisor tool to launch and monitor multiple SauceLabs Sauce Connect tunnel in [high avaiability mode](https://wiki.saucelabs.com/display/DOCS/High+Availability+Sauce+Connect+Setup).
 
@@ -227,3 +231,8 @@ To avoid network blast (in case all tunnels are scheduled at the same time), som
 
 1. Each tunnel takes random delay [0, 5000] ms to start
 2. Each tunnel takes random delay [0, 5000] ms to stop
+
+## Licenses
+
+All code not otherwise specified is Copyright Wal-Mart Stores, Inc.
+Released under the [MIT](./LICENSE) License.
