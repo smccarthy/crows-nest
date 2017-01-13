@@ -225,6 +225,25 @@ Crows-nest Supervisor keeps track of all Crows-nest Tunnels. It does following t
 3. Restart all tunnels by sending `restart` signals to each Tunnel according to schedule
 4. Stop all Tunnels by sending `stop` signals to each Tunnel
 
+### Running From Docker
+
+1. Setup your `config.json`
+2. Build:
+
+```
+docker build -t testarmada/crows-nest .
+```
+
+3. Run:
+
+```
+docker run --rm testarmada/crows-nest [YOUR COMMAND HERE]
+```
+For example:
+```
+docker run --rm testarmada/crows-nest bin/supervise --tunnels 1
+```
+
 ### Randomness
 
 To avoid network blast (in case all tunnels are scheduled at the same time), some randomness are introduced
