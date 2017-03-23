@@ -9,6 +9,10 @@
     "noRemoveCollidingTunnels": true,
     "sharedTunnel": true
   },
+  "supervisor": {
+    "portStart": 4000,
+    "portIndent": 5
+  },
   "stats": {
     "statsType": "influxdb",
     "statsHost": "",

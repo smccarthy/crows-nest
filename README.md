@@ -20,7 +20,7 @@ By launching sauce tunnels in high availability mode with crows-nest, you won't 
 
 ### How to Build
 
-Since Crows-nest is coded in ES6, you might need to compile it before running it in your nodejs env. To compile, run following commands in the repo root
+Since Crows-nest is coded in ES6, you need to compile before running it in your nodejs env. To compile, run following commands in the repo root
  1. `npm install`
  2. `npm run build`
 
@@ -38,6 +38,10 @@ Since Crows-nest is coded in ES6, you might need to compile it before running it
     "waitTunnelShutdown": true,
     "noRemoveCollidingTunnels": true,
     "sharedTunnel": true
+  },
+  "supervisor": {
+    "portStart": 4000,
+    "portIndent": 5
   },
   "stats": {
     "statsType": "",
@@ -66,9 +70,13 @@ You can set `tunnel.username` and `tunnel.accessKey` using one of the following 
  1. Specifying the values in `./config.json`
  2. Setting the environment variable `SAUCE_USERNAME` and `SAUCE_ACCESS_KEY`
 
+#### Supervisor config
+
+Since `@1.5.0` `crows-nest` supports multi-tenant mode. If you want to run multiple `crows-nest` instances per box, `supervisor.portStart` and `supervisor.portIndent` are configs you want to change. `supervisor.portStart` allows you to identify the port of the first tunnel of current `crows-nest` instance will use, then every following tunnels will pick up the port `supervisor.portStart + index * supervisor.portIndent`.
+
 #### Stats config
 
-From `@1.3.0` crows-nest starts to support pushing stats to a statsd-like system. To utilize this data pushing function you need to explicitly add `--stats` in your command. There are only two adaptors supported for now, adaptor for [telegraf](https://github.com/influxdata/telegraf) and adaptor for pushing data into influxdb directly. You can extend `lib/stats/base` to add more adaptors. 
+Since `@1.3.0` `crows-nest` starts to support pushing stats to a statsd-like system. To utilize this data pushing function you need to explicitly add `--stats` in your command. There are only two adaptors supported for now, adaptor for [telegraf](https://github.com/influxdata/telegraf) and adaptor for pushing data into influxdb directly. You can extend `lib/stats/base` to add more adaptors. 
 
 For instance, in `config.json`, `stats.statsType =  influxdb` will tell the adaptor factory to look for a mapping with key `influxdb` configured in `factory.js`. Adaptor factory will return an instance of influxdb adaptor which is defined in `influxdb.js`. If there is no adaptor found by adaptor factory, it will throw an error to prevent crows-nest from starting.
 
@@ -88,26 +96,26 @@ If the rolling restart feature is enabled, `restartCron` must be a valid cron va
 
 ### Help
 
-```
+```bash
 ./bin/supervise --help
 ```
 
 ### Basic usage
 
 Start one sauce tunnel in high availability mode:
-```
+```bash
 ./bin/supervise --tunnels 1
 ```
 
 With rolling restart feature:
-```
+```bash
 SAUCE_USERNAME=xxx SAUCE_ACCESS_KEY=yyy ./bin/supervise --tunnels 1 --rollingRestart
 ```
 
 ### Advanced usage
 
 Read sauce tunnel configuration from `./myproject/config.json` and launch 20 sauce tunnels in high availability mode, with rolling restarted and stats data pushing feature enabled
-```
+```bash
 ./bin/supervise --tunnels 20 --config ./myproject/config.json --rollingRestart --stats
 ```
 
@@ -116,18 +124,29 @@ Read sauce tunnel configuration from `./myproject/config.json` and launch 20 sau
 We use [pm2](https://www.npmjs.com/package/pm2) to run the supervisor process as a daemon
 
 To start:
-```
+```bash
 ./node_modules/.bin/pm2 start ./bin/supervise --kill-timeout 600000 --silent -- --tunnels 10 --rollingRestart
 ```
 
 To stop:
-```
+```bash
 ./node_modules/.bin/pm2 stop supervise
 ```
 
 To view the log:
-```
+```bash
 ./node_modules/.bin/pm2 log --lines 100
+```
+
+#### Multi tenants
+To start:
+```bash
+./node_modules/.bin/pm2 start -n ${TENANT_NAME} ./bin/supervise --kill-timeout 600000 --silent -- --tunnels 10 --rollingRestart --config ${TENANT_NAME}_config.json
+```
+
+To stop:
+```bash
+./node_modules/.bin/pm2 stop -n ${TENANT_NAME}
 ```
 
 ## Design
@@ -230,17 +249,17 @@ Crows-nest Supervisor keeps track of all Crows-nest Tunnels. It does following t
 1. Setup your `config.json`
 2. Build:
 
-```
+```bash
 docker build -t testarmada/crows-nest .
 ```
 
 3. Run:
 
-```
+```bash
 docker run --rm testarmada/crows-nest [YOUR COMMAND HERE]
 ```
 For example:
-```
+```bash
 docker run --rm testarmada/crows-nest bin/supervise --tunnels 1
 ```
 

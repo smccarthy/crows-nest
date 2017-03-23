@@ -21,27 +21,33 @@ const assert = chai.assert;
 describe("Supervisor", () => {
   it("Initialization", () => {
     let s = new Supervisor({
-      tunnelAmount: 1,
-      tunnelConfig: {
-        "username": "fake_name",
-        "accessKey": "fake_key",
-        "verbose": false,
-        "proxy": null,
-        "tunnelIdentifier": "testfortest",
-        "waitTunnelShutdown": true,
-        "noRemoveCollidingTunnels": true,
-        "sharedTunnel": true,
+      config: {
+        tunnel: {
+          "username": "fake_name",
+          "accessKey": "fake_key",
+          "verbose": false,
+          "proxy": null,
+          "tunnelIdentifier": "testfortest",
+          "waitTunnelShutdown": true,
+          "noRemoveCollidingTunnels": true,
+          "sharedTunnel": true,
 
-        "restartCron": "*/2 * * * *"
+          "restartCron": "*/2 * * * *"
+        },
+        supervisor: {
+          "portStart": 4000,
+          "portIndent": 6
+        },
+        stats: {
+          "statsType": "influxdb",
+          "statsHost": "",
+          "statsPort": null,
+          "statsPrefix": "testdddtest.",
+          "statsDatabase": ""
+        }
       },
+      tunnelAmount: 1,
       statsSwitch: false,
-      statsConfig: {
-        "statsType": "influxdb",
-        "statsHost": "",
-        "statsPort": null,
-        "statsPrefix": "testdddtest.",
-        "statsDatabase": ""
-      },
       restartCron: false
     });
 
@@ -59,27 +65,33 @@ describe("Supervisor", () => {
 
       before(() => {
         s = new Supervisor({
-          tunnelAmount: 1,
-          tunnelConfig: {
-            "username": "fake_name",
-            "accessKey": "fake_key",
-            "verbose": false,
-            "proxy": null,
-            "tunnelIdentifier": "testfortest",
-            "waitTunnelShutdown": true,
-            "noRemoveCollidingTunnels": true,
-            "sharedTunnel": true,
+          config: {
+            tunnel: {
+              "username": "fake_name",
+              "accessKey": "fake_key",
+              "verbose": false,
+              "proxy": null,
+              "tunnelIdentifier": "testfortest",
+              "waitTunnelShutdown": true,
+              "noRemoveCollidingTunnels": true,
+              "sharedTunnel": true,
 
-            "restartCron": "*/2 * * * *"
+              "restartCron": "*/2 * * * *"
+            },
+            stats: {
+              "statsType": "influxdb",
+              "statsHost": "",
+              "statsPort": null,
+              "statsPrefix": "testdddtest.",
+              "statsDatabase": ""
+            },
+            supervisor: {
+              "portStart": 4000,
+              "portIndent": 6
+            }
           },
+          tunnelAmount: 1,
           statsSwitch: false,
-          statsConfig: {
-            "statsType": "influxdb",
-            "statsHost": "",
-            "statsPort": null,
-            "statsPrefix": "testdddtest.",
-            "statsDatabase": ""
-          },
           restartCron: false
         });
 
@@ -106,27 +118,33 @@ describe("Supervisor", () => {
 
       before(() => {
         s = new Supervisor({
-          tunnelAmount: 10,
-          tunnelConfig: {
-            "username": "fake_name",
-            "accessKey": "fake_key",
-            "verbose": false,
-            "proxy": null,
-            "tunnelIdentifier": "testfortest",
-            "waitTunnelShutdown": true,
-            "noRemoveCollidingTunnels": true,
-            "sharedTunnel": true,
+          config: {
+            tunnel: {
+              "username": "fake_name",
+              "accessKey": "fake_key",
+              "verbose": false,
+              "proxy": null,
+              "tunnelIdentifier": "testfortest",
+              "waitTunnelShutdown": true,
+              "noRemoveCollidingTunnels": true,
+              "sharedTunnel": true,
 
-            "restartCron": "*/2 * * * *"
+              "restartCron": "*/2 * * * *"
+            },
+            stats: {
+              "statsType": "influxdb",
+              "statsHost": "",
+              "statsPort": null,
+              "statsPrefix": "testdddtest.",
+              "statsDatabase": ""
+            },
+            supervisor: {
+              "portStart": 4000,
+              "portIndent": 5
+            }
           },
+          tunnelAmount: 10,
           statsSwitch: false,
-          statsConfig: {
-            "statsType": "influxdb",
-            "statsHost": "",
-            "statsPort": null,
-            "statsPrefix": "testdddtest.",
-            "statsDatabase": ""
-          },
           restartCron: false
         });
 
@@ -159,17 +177,23 @@ describe("Supervisor", () => {
     before(() => {
       s = new Supervisor({
         tunnelAmount: 3,
-        tunnelConfig: {
-          "username": "fake_name",
-          "accessKey": "fake_key",
-          "verbose": false,
-          "proxy": null,
-          "tunnelIdentifier": "testfortest",
-          "waitTunnelShutdown": true,
-          "noRemoveCollidingTunnels": true,
-          "sharedTunnel": true,
+        config: {
+          tunnel: {
+            "username": "fake_name",
+            "accessKey": "fake_key",
+            "verbose": false,
+            "proxy": null,
+            "tunnelIdentifier": "testfortest",
+            "waitTunnelShutdown": true,
+            "noRemoveCollidingTunnels": true,
+            "sharedTunnel": true,
 
-          "restartCron": "*/2 * * * *"
+            "restartCron": "*/2 * * * *"
+          },
+          supervisor: {
+            "portStart": 4000,
+            "portIndent": 6
+          }
         },
         restartCron: false
       });
@@ -223,21 +247,27 @@ describe("Supervisor", () => {
     before(() => {
       s = new Supervisor({
         tunnelAmount: 3,
-        tunnelConfig: {
-          "username": "fake_name",
-          "accessKey": "fake_key",
-          "verbose": false,
-          "proxy": null,
-          "tunnelIdentifier": "testfortest",
-          "waitTunnelShutdown": true,
-          "noRemoveCollidingTunnels": true,
-          "sharedTunnel": true,
+        config: {
+          tunnel: {
+            "username": "fake_name",
+            "accessKey": "fake_key",
+            "verbose": false,
+            "proxy": null,
+            "tunnelIdentifier": "testfortest",
+            "waitTunnelShutdown": true,
+            "noRemoveCollidingTunnels": true,
+            "sharedTunnel": true,
 
-          "restartCron": "*/2 * * * *"
+            "restartCron": "*/2 * * * *"
+          },
+          supervisor: {
+            "portStart": 4000,
+            "portIndent": 6
+          }
         },
         restartCron: false
       });
-      
+
       return s
         .stage();
     });
@@ -255,38 +285,8 @@ describe("Supervisor", () => {
   describe("Stats", () => {
     it("Stats is enabled with valid adaptor", () => {
       let s = new Supervisor({
-        tunnelAmount: 3,
-        tunnelConfig: {
-          "username": "fake_name",
-          "accessKey": "fake_key",
-          "verbose": false,
-          "proxy": null,
-          "tunnelIdentifier": "testfortest",
-          "waitTunnelShutdown": true,
-          "noRemoveCollidingTunnels": true,
-          "sharedTunnel": true,
-
-          "restartCron": "*/2 * * * *"
-        },
-        statsSwitch: true,
-        statsConfig: {
-          "statsType": "influxdb",
-          "statsHost": "",
-          "statsPort": null,
-          "statsPrefix": "testdddtest.",
-          "statsDatabase": ""
-        },
-        restartCron: false
-      });
-
-      assert(true, "Stats is enabled with valid adaptor");
-    });
-
-    it("Stats is enabled with invalid adaptor", () => {
-      try {
-        let s = new Supervisor({
-          tunnelAmount: 3,
-          tunnelConfig: {
+        config: {
+          tunnel: {
             "username": "fake_name",
             "accessKey": "fake_key",
             "verbose": false,
@@ -298,14 +298,56 @@ describe("Supervisor", () => {
 
             "restartCron": "*/2 * * * *"
           },
-          statsSwitch: true,
-          statsConfig: {
-            "statsType": "mongodb",
+          supervisor: {
+            "portStart": 4000,
+            "portIndent": 6
+          },
+          stats: {
+            "statsType": "influxdb",
             "statsHost": "",
             "statsPort": null,
             "statsPrefix": "testdddtest.",
             "statsDatabase": ""
+          }
+        },
+        tunnelAmount: 3,
+        statsSwitch: true,
+        restartCron: false
+      });
+
+      assert(true, "Stats is enabled with valid adaptor");
+    });
+
+    it("Stats is enabled with invalid adaptor", () => {
+      try {
+        let s = new Supervisor({
+          config: {
+            tunnel: {
+              "username": "fake_name",
+              "accessKey": "fake_key",
+              "verbose": false,
+              "proxy": null,
+              "tunnelIdentifier": "testfortest",
+              "waitTunnelShutdown": true,
+              "noRemoveCollidingTunnels": true,
+              "sharedTunnel": true,
+
+              "restartCron": "*/2 * * * *"
+            },
+            supervisor: {
+              "portStart": 4000,
+              "portIndent": 6
+            },
+            stats: {
+              "statsType": "mongodb",
+              "statsHost": "",
+              "statsPort": null,
+              "statsPrefix": "testdddtest.",
+              "statsDatabase": ""
+            }
           },
+          tunnelAmount: 3,
+          statsSwitch: true,
           restartCron: false
         });
 
@@ -318,27 +360,34 @@ describe("Supervisor", () => {
     it("Stats is disabled with invalid adaptor", () => {
       try {
         let s = new Supervisor({
-          tunnelAmount: 3,
-          tunnelConfig: {
-            "username": "fake_name",
-            "accessKey": "fake_key",
-            "verbose": false,
-            "proxy": null,
-            "tunnelIdentifier": "testfortest",
-            "waitTunnelShutdown": true,
-            "noRemoveCollidingTunnels": true,
-            "sharedTunnel": true,
+          config: {
+            tunnel: {
+              "username": "fake_name",
+              "accessKey": "fake_key",
+              "verbose": false,
+              "proxy": null,
+              "tunnelIdentifier": "testfortest",
+              "waitTunnelShutdown": true,
+              "noRemoveCollidingTunnels": true,
+              "sharedTunnel": true,
 
-            "restartCron": "*/2 * * * *"
+              "restartCron": "*/2 * * * *"
+            },
+            supervisor: {
+              "portStart": 4000,
+              "portIndent": 6
+            },
+
+            stats: {
+              "statsType": "mongodb",
+              "statsHost": "",
+              "statsPort": null,
+              "statsPrefix": "testdddtest.",
+              "statsDatabase": ""
+            },
           },
+          tunnelAmount: 3,
           statsSwitch: false,
-          statsConfig: {
-            "statsType": "mongodb",
-            "statsHost": "",
-            "statsPort": null,
-            "statsPrefix": "testdddtest.",
-            "statsDatabase": ""
-          },
           restartCron: false
         });
 
