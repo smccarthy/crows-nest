@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![codecov](https://codecov.io/gh/TestArmada/crows-nest/branch/master/graph/badge.svg)](https://codecov.io/gh/TestArmada/crows-nest)
 
-A supervisor tool to launch and monitor multiple SauceLabs Sauce Connect tunnel in [high avaiability mode](https://wiki.saucelabs.com/display/DOCS/High+Availability+Sauce+Connect+Setup).
+A supervisor tool to launch and monitor multiple SauceLabs Sauce Connect tunnel in [high availability mode](https://wiki.saucelabs.com/display/DOCS/High+Availability+Sauce+Connect+Setup).
 
 The tool tracks the availability of each tunnel. If any of the tunnels is unresponsive, the supervisor will attempt to terminate the tunnel gracefully and start a new one. Additionally, the tool provides the ability to perform "rolling restarts" all the tunnels periodically to avoid known issues with long-running tunnel processes.
 
@@ -63,7 +63,7 @@ To launch your own tunnels, `tunnel.username`, `tunnel.accessKey` and `tunnel.tu
 
 In high availability mode all tunnels share the same `tunnel.tunnelIdentifier`. `tunnel.tunnelIdentifier` can be any string.  One suggested convention is to use this ID to describe the geographical location where your tunnel terminates.  For example, `east` or `west`.  
 
-The `restartCron` value is any valid cron schedule.  For example `0 */4 * * *` would mean "every 4 hours".  We recommend [crontab.guru](http://crontab.guru/examples.html) for help generating valid cron strings to match the desired schedule.
+The `restartCron` value is any valid cron schedule.  For example, `0 */4 * * *` would mean "every 4 hours".  We recommend [crontab.guru](http://crontab.guru/examples.html) for help generating valid cron strings to match the desired schedule.
 
 You can set `tunnel.username` and `tunnel.accessKey` using one of the following methods:
  
@@ -265,7 +265,7 @@ docker run --rm testarmada/crows-nest bin/supervise --tunnels 1
 
 ### Randomness
 
-To avoid network blast (in case all tunnels are scheduled at the same time), some randomness are introduced
+To avoid network blast (in case all tunnels are scheduled at the same time), some randomness is introduced
 
 1. Each tunnel takes random delay [0, 5000] ms to start
 2. Each tunnel takes random delay [0, 5000] ms to stop
