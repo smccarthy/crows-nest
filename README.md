@@ -35,7 +35,6 @@ Since Crows-nest is coded in ES6, you need to compile before running it in your 
     "verbose": false,
     "proxy": null,
     "tunnelIdentifier": "",
-    "waitTunnelShutdown": true,
     "noRemoveCollidingTunnels": true,
     "sharedTunnel": true
   },

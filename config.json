@@ -5,7 +5,6 @@
     "verbose": false,
     "proxy": null,
     "tunnelIdentifier": "",
-    "waitTunnelShutdown": true,
     "noRemoveCollidingTunnels": true,
     "sharedTunnel": true
   },
